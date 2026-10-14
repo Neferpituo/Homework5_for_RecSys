@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HW5 — Matrix Factorization</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <noscript>
+    <p class="load-error">JavaScript required — please enable scripts for this directory and reload.</p>
+  </noscript>
+
+  <header class="site-header">
+    <h1>HW5 — Matrix Factorization</h1>
+    <p class="subtitle">MovieLens 100k rating prediction with a TensorFlow.js factor model, plus top-10 retrieval and Recall@10 evaluation.</p>
+    <p class="note">Models are trained with TensorFlow.js on the WebGL backend when available (falls back to CPU).</p>
+  </header>
+
+  <main>
+    <p id="status" class="status" role="status" aria-live="polite">Loading…</p>
+
+    <section aria-labelledby="tf-status-heading" class="panel">
+      <h2 id="tf-status-heading">TensorFlow.js status</h2>
+      <p id="tf-status" class="status-line">Loading TensorFlow.js…</p>
+    </section>
+
+    <section aria-labelledby="dataset-summary-heading" class="panel">
+      <h2 id="dataset-summary-heading">Dataset summary</h2>
+      <div id="dataset-summary-body">
+        <p class="empty-state">Loading dataset…</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="split-summary-heading" class="panel">
+      <h2 id="split-summary-heading">Train / validation / test split</h2>
+      <div id="split-summary-body">
+        <p class="empty-state">Loading split…</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="training-heading" class="panel">
+      <h2 id="training-heading">Training</h2>
+
+      <div class="control-grid">
+        <div class="control">
+          <label for="epochs">Epochs</label>
+          <input type="number" id="epochs" name="epochs" value="20" min="1" step="1" inputmode="numeric">
+          <p class="hint">Full passes over the training ratings.</p>
+        </div>
+
+        <div class="control">
+          <label for="lr">Learning rate</label>
+          <input type="number" id="lr" name="lr" value="0.01" min="0.0001" step="0.001" inputmode="decimal">
+          <p class="hint">Adam step size.</p>
+        </div>
+
+        <div class="control">
+          <label for="reg">L2 regularization</label>
+          <input type="number" id="reg" name="reg" value="0.05" min="0" step="0.01" inputmode="decimal">
+          <p class="hint">Penalty strength on the factor norms.</p>
+        </div>
+
+        <div class="control">
+          <label for="batch-size">Batch size</label>
+          <input type="number" id="batch-size" name="batch-size" value="64" min="1" step="1" inputmode="numeric">
+          <p class="hint">Mini-batch size; values above the training size use full-batch.</p>
+        </div>
+
+        <div class="control">
+          <label for="engine">Engine</label>
+          <select id="engine" name="engine">
+            <option value="js" selected>Pure JS (SGD)</option>
+            <option value="tfjs">TensorFlow.js</option>
+          </select>
+          <p class="hint">Pure JS runs a hand-written SGD loop on typed arrays (fast, no GPU needed); TensorFlow.js uses the WebGL/GPU tensor path and falls back to CPU.</p>
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button type="button" id="train">Train</button>
+      </div>
+
+      <h3 id="training-curve-heading">Training / validation / test curves</h3>
+      <div id="training-curve" aria-labelledby="training-curve-heading">
+        <p class="empty-state">No training history yet. Press “Train” to run the model.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="metrics-heading" class="panel">
+      <h2 id="metrics-heading">Metrics</h2>
+      <div id="metrics-body">
+        <p class="empty-state">Train the model to compute the baseline and matrix-factorization RMSE.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="analytics-heading" class="panel">
+      <h2 id="analytics-heading">Analytics — familiar choices vs. new discoveries</h2>
+      <div id="analytics-body">
+        <p class="empty-state">Train the model to compare each user's Top-10 with their past ratings.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="recommendations-heading" class="panel">
+      <h2 id="recommendations-heading">Recommendations</h2>
+
+      <div class="control">
+        <label for="user-select">User</label>
+        <select id="user-select" name="user-select">
+          <option value="">Loading users…</option>
+        </select>
+      </div>
+
+      <div class="button-row">
+        <button type="button" id="recommend-btn">Recommend Top-10</button>
+      </div>
+
+      <h3 id="recommendations-list-heading">Top-10 items</h3>
+      <div id="recommendations" aria-labelledby="recommendations-list-heading">
+        <p class="empty-state">Train the model before requesting recommendations.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="recall-heading" class="panel">
+      <h2 id="recall-heading">Retrieval evaluation</h2>
+
+      <div class="button-row">
+        <button type="button" id="recall-btn" class="secondary">Evaluate Recall@10</button>
+      </div>
+
+      <div id="recall-results">
+        <p class="empty-state">Train the model, then evaluate Recall@10 on the test split.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="self-checks-heading" class="panel">
+      <h2 id="self-checks-heading">Self-checks</h2>
+
+      <div class="button-row">
+        <button type="button" id="run-tests" class="secondary">Run tests</button>
+      </div>
+
+      <pre id="testLog" class="test-log" tabindex="0" aria-label="Self-check log">Press “Run tests” to execute the self-checks.</pre>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+  <script src="data.js?v=20261014"></script>
+  <script src="script.js?v=20261014"></script>
+</body>
+</html>
